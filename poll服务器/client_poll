@@ -1,0 +1,63 @@
+#include<stdio.h>
+#include<sys/socket.h>
+#include<netinet/in.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<stdlib.h>
+#include<errno.h>
+#include<unistd.h>
+
+int startup(char* ip_buf,char* port_buf)
+{
+    int sock=socket(AF_INET,SOCK_STREAM,0);
+    if(sock<0)
+    {
+        perror("socket");
+        return -1;
+    }
+    struct sockaddr_in addr;
+    addr.sin_family=AF_INET;
+    addr.sin_addr.s_addr=inet_addr(ip_buf);
+    addr.sin_port=htons(atoi(port_buf));
+
+    int con=connect(sock,(struct sockaddr*)&addr,sizeof(addr));
+    if(con<0)
+    {
+        perror("connect");
+        return -2;
+    }
+    printf(" connect success ...\n");
+    return sock;
+}
+int main(int argc,char* argv[])
+{
+    if(argc!=3)
+    {
+        printf("Usage: ./client [ip] [port]");
+        return 1;
+    }
+    int sock =startup(argv[1],argv[2]);
+    if(sock<0)
+    {
+        printf("startup\n");
+        return 2;
+    }
+    for(;;)
+    {
+        char buf[1024]={0};
+        printf("client >:");
+        fflush(stdin);
+        fgets(buf,sizeof(buf),stdin);
+        //read(0,buf,sizeof(buf)-1);
+        write(sock,buf,sizeof(buf));
+        if(strncasecmp(buf,"quit",4)==0)
+        {
+            printf("client quit!");
+            break;
+        }
+        read(sock,buf,sizeof(buf)-1);
+        printf("server >:%s",buf);
+    }
+
+    return 0;
+}
