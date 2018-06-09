@@ -2,9 +2,9 @@
 all:client server
 
 client:client_tcp.c
-	gcc $^ -o $@ 
+	gcc -o $@ $^
 server:server_tcp.c
-	gcc $^ -o $@ 
+	gcc -o $@ $^
 
 .PHONY:clean
 clean:
