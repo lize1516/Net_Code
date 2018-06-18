@@ -1,0 +1,56 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<unistd.h>
+
+void cal(char* data)
+{
+
+    int d1,d2;
+    sscanf(data,"first_num=%d&second_num=%d",&d1,&d2);
+
+    printf("<html>\n");
+    printf("<h3>%d+%d=%d</h3>\n",d1,d2,d1+d2);
+    printf("<h3>%d-%d=%d</h3>\n",d1,d2,d1-d2);
+    printf("<h3>%dx%d=%d</h3>\n",d1,d2,d1*d2);
+    printf("<h3>%d/%d=%d</h3>\n",d1,d2,d1/d2);
+    printf("<h3>%d%%%d=%d</h3>\n",d1,d2,d1%d2);
+
+    printf("</html>\n");
+}
+
+int main()
+{
+    /////////////////////////////////////////////////
+    //printf("cgi: %s\n",getenv("METHOD"));
+    char method[32];
+    char buff[1024];
+    if(getenv("METHOD")!=NULL)
+    {
+        strcpy(method,getenv("METHOD"));
+        printf("%s\n",method);
+        if(strcasecmp(method,"GET")==0)
+        {
+            strcpy(buff,getenv("QUERY_STRING"));
+        }
+        else if(strcasecmp(method,"POST")==0) 
+        {
+            int content_len=atoi(getenv("CONTENT_LENGTH"));
+            char ch;
+            int i=0;
+            for(;i<content_len;i++)
+            {
+                read(0,&ch,1);
+                buff[i]=ch;
+            }
+            buff[i]='\0';
+        }
+        else
+        {
+            return 0;
+        }
+      cal(buff);  
+    }
+
+    return 0;
+}
